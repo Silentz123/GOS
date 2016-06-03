@@ -1,5 +1,5 @@
 
-local version = 1.05
+local version = 1.06
 local sEnemies = GetEnemyHeroes()
 local sAllies = GetAllyHeroes()
 local wards = {}
@@ -19,7 +19,7 @@ function PrintMessage(message) print("<font color=\"#339999\"><b>Perfect Vision:
 
 function AutoUpdate(data)
     if tonumber(data) > tonumber(version) then
-        PrintMessage("New Cassiopeia Script Version Found: Version " .. data)
+        PrintMessage("New Perfect Vision Script Version Found: Version " .. data)
         PrintMessage("Downloading...")
         DownloadFileAsync("https://raw.githubusercontent.com/x0Z3R0/GOS/master/PerfectVision.lua", SCRIPT_PATH .. "PerfectVision.lua", function() PrintMessage("Updated to version " .. tonumber(data) .. " Please press twice F6.") return end)
     else
