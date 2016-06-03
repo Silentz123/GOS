@@ -67,7 +67,7 @@ end)
 function CreateObj(object) 
 	if(PerfectVisionMenu.enabled:Value())then
 		if object and(object.name:lower():find("visionward") or object.name:lower():find("sightward")) and object.networkID ~= 0 then
-			if not GetTeam(object) == GetTeam(myHero) or 1==1 then
+			if not GetTeam(object) == GetTeam(myHero)then
 				i = 1
 				while i < wardNumber do
 					if(wards[i])then
