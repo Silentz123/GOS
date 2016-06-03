@@ -1,9 +1,9 @@
 
-local version = 1.00
+local version = 1.02
 local sEnemies = GetEnemyHeroes()
 local sAllies = GetAllyHeroes()
 local wards = {}
-local wardNumber = 50
+local wardNumber = 70
 
 require "MapPosition"
 require "MapPositionGOS"
@@ -12,18 +12,35 @@ PerfectVisionMenu = Menu("perfectVision", "Perfect Vision")
 PerfectVisionMenu:Boolean("enabled", "Enabled",true)
 PerfectVisionMenu:SubMenu("Draws", "Draws  Settings")
 PerfectVisionMenu.Draws:Boolean("draw", "Draw wards", true)
+PerfectVisionMenu.Draws:Boolean("drawMinimap", "Draw Minimap", true)
 PerfectVisionMenu.Draws:Slider("qualityMultiplier", "Vision Quality", 3, 1, 5, 1, nil, true)
 
-function PrintMessage(message) print("<font color=\"#339999\"><b>Artificial Warding (Alpha):</font> </b><font color=\"#DDDDDD\">" .. message) end
+function PrintMessage(message) print("<font color=\"#339999\"><b>Perfect Vision:</font> </b><font color=\"#DDDDDD\">" .. message) end
+
+function AutoUpdate(data)
+    if tonumber(data) > tonumber(version) then
+        PrintMessage("New Cassiopeia Script Version Found: Version " .. data)
+        PrintMessage("Downloading...")
+        DownloadFileAsync("https://raw.githubusercontent.com/x0Z3R0/GOS/master/PerfectVision.lua", SCRIPT_PATH .. "PerfectVision.lua", PrintMessage("Updated to version " .. tonumber(data) .. " Please press twice F6."))
+ return end)
+    else
+        PrintMessage("Script is up to date")
+    end
+end
 
 OnLoad(function()
+	
 	PrintMessage("Have fun, WhiteHat.")
+	GetWebResultAsync("https://raw.githubusercontent.com/x0Z3R0/GOS/master/PerfectVision.version", AutoUpdate)
+	
+	
+	Callback.Add("CreateObj", function(object) CreateObj(object) end)
 end)
 
 function GetDrawPoints(index) 
-	i = 1
-	wardVector = Vector(wards[index][1],wards[index][2],wards[index][3])
-	alpha = 0
+	local i = 1
+	local wardVector = Vector(wards[index][1],wards[index][2],wards[index][3])
+	local alpha = 0
 	while(i <= 36 * PerfectVisionMenu.Draws.qualityMultiplier:Value() ) do
 		alpha = alpha + 360 / 36 / PerfectVisionMenu.Draws.qualityMultiplier:Value()
 		wards[index][4+i] = {}
@@ -44,11 +61,13 @@ function GetDrawPoints(index)
 		i = i + 1
 	end
 end
-
-OnCreateObj(function (object) 
+OnObjectLoad(function(object)
+	CreateObj(object)
+end)
+function CreateObj(object) 
 	if(PerfectVisionMenu.enabled:Value())then
 		if object and(object.name:lower():find("visionward") or object.name:lower():find("sightward")) and object.networkID ~= 0 then
-			if not GetTeam(object) == GetTeam(myHero) then
+			if not GetTeam(object) == GetTeam(myHero) or 1==1 then
 				i = 1
 				while i < wardNumber do
 					if(wards[i])then
@@ -66,7 +85,7 @@ OnCreateObj(function (object)
 			end
 		end
 	end
-end)
+end
 
 
 OnDeleteObj(function (object) 
@@ -87,15 +106,14 @@ OnDeleteObj(function (object)
 end)
 
 OnDraw(function() 
-		aaa = 0
-		num = 1
+		
+		local num = 1
 		if(PerfectVisionMenu.Draws.draw:Value() and PerfectVisionMenu.enabled:Value()) then
 			while num < wardNumber do
 				if(wards[num]) then
-					aaa = aaa + 1
 					ward = wards[num]
 					i = 1
-					DrawCircle(wards[num][1],wards[num][2],wards[num][3],50,2,500,ARGB(128,255,0,0))
+					DrawCircle(wards[num][1],wards[num][2],wards[num][3],50,1,500,ARGB(128,255,0,0))
 					while(ward[4+i]) do
 						if ward[5+i] then
 							DrawLine3D(ward[4+i][1],ward[4+i][2],ward[4+i][3],ward[5+i][1],ward[5+i][2],ward[5+i][3],3,ARGB(128,255,30,30))
@@ -108,4 +126,18 @@ OnDraw(function()
 				num = num + 1
 			end
 		end
+end)
+
+OnDrawMinimap(function()
+	local num = 1
+	if(PerfectVisionMenu.Draws.draw:Value() and PerfectVisionMenu.enabled:Value() and PerfectVisionMenu.Draws.drawMinimap:Value()) then
+		while num < wardNumber do
+			if(wards[num]) then
+				v = Vector(wards[num][1],wards[num][2],wards[num][3])
+				DrawCircleMinimap(v.x,0,v.z,200,2,300,ARGB(128,200,0,0))
+			end
+			num = num + 1
+		end
+	end
+
 end)
