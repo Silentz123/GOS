@@ -1,5 +1,5 @@
 
-local version = 1.07
+local version = 1.09
 local sEnemies = GetEnemyHeroes()
 local sAllies = GetAllyHeroes()
 local wards = {}
